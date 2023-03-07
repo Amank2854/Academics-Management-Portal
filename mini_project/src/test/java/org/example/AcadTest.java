@@ -20,7 +20,7 @@ class AcadTest {
     public static void init() throws Exception {
         final String DB_URL_2 = "jdbc:postgresql://localhost/mini_project";
         final String USER = "postgres";
-        final String PASSWORD = "aman123456789000";
+        final String PASSWORD = "password";
         try {
             con = DriverManager.getConnection(DB_URL_2, USER, PASSWORD);
         } catch (SQLException e) {

@@ -9,7 +9,7 @@ public class Main
     {
         final String DB_URL_2 = "jdbc:postgresql://localhost/mini_project";
         final String USER = "postgres";
-        final String PASSWORD = "aman123456789000";
+        final String PASSWORD = "password";
         DBinit db = new DBinit();
         db.connect();
         Scanner sc = new Scanner(System.in);

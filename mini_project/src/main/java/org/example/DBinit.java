@@ -39,7 +39,7 @@ public class DBinit
         final String DB_URL_1 = "jdbc:postgresql://localhost/postgres";
         final String DB_URL_2 = "jdbc:postgresql://localhost/mini_project";
         final String USER = "postgres";
-        final String PASSWORD = "aman123456789000";
+        final String PASSWORD = "password";
 
         try
         {
