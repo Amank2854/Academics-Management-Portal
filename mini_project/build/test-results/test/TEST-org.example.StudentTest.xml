@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.StudentTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2023-03-07T16:48:08" hostname="LAPTOP-MA03V1M3" time="0.079">
+  <properties/>
+  <testcase name="show_CGPA()" classname="org.example.StudentTest" time="0.01"/>
+  <testcase name="grad_Status()" classname="org.example.StudentTest" time="0.016"/>
+  <testcase name="view_Grades()" classname="org.example.StudentTest" time="0.003"/>
+  <testcase name="deregister()" classname="org.example.StudentTest" time="0.002"/>
+  <testcase name="register()" classname="org.example.StudentTest" time="0.031"/>
+  <testcase name="home()" classname="org.example.StudentTest" time="0.002"/>
+  <testcase name="update_Profile()" classname="org.example.StudentTest" time="0.008"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,560 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > Student</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.example</a>
+</div>
+
+<h1>Coverage Summary for Class: Student (org.example)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Student</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (8/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    96.4%
+  </span>
+  <span class="absValue">
+    (293/304)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;
+&nbsp;
+&nbsp;package org.example;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.util.*;
+&nbsp;import java.sql.*;
+<b class="fc">&nbsp;public class Student</b>
+&nbsp;{
+&nbsp;    public String Register(Connection con, String entry) throws SQLException {
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+<b class="fc">&nbsp;        String sql = &quot;select DISTINCT o.course_id from offerings as o where o.course_id NOT IN (select r.course_id from registrations as r where r.student_id = ?) order by o.course_id;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        ResultSet rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Courses List:&quot;);</b>
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            System.out.println(rs.getString(&quot;course_id&quot;));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //Check for Credits left
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Enter the Course ID you want to register&quot;);</b>
+&nbsp;        String id;
+<b class="fc">&nbsp;        id = sc.nextLine();</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from student where entry_no = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int present_credits = rs.getInt(&quot;credits&quot;);</b>
+<b class="fc">&nbsp;        int prev_1 = rs.getInt(&quot;cred_prev&quot;);</b>
+<b class="fc">&nbsp;        int prev_2 = rs.getInt(&quot;cred_prev_2&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select C from catalog where course_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int course_creds = rs.getInt(&quot;C&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        if (course_creds + present_credits &gt; 24 || present_credits + course_creds &gt; (prev_1 + prev_2) / 2) {</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Credits Limit Exceeded&quot;);</b>
+<b class="fc">&nbsp;            return entry;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from prerequisite where course_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        ArrayList&lt;String&gt; pre_req = new ArrayList&lt;String&gt;();</b>
+<b class="fc">&nbsp;        while (rs.next())</b>
+&nbsp;        {
+<b class="fc">&nbsp;            pre_req.add(rs.getString(&quot;reqd_id&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        boolean flag = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        for(String s : pre_req)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            sql = &quot;select * from grades where course_id = ? and student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;            ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;            ps.setString(1,s);</b>
+<b class="fc">&nbsp;            ps.setString(2,entry);</b>
+<b class="fc">&nbsp;            rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;            if(!rs.next())</b>
+&nbsp;            {
+<b class="nc">&nbsp;                flag = true;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+&nbsp;            else
+&nbsp;            {
+<b class="fc">&nbsp;                if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</b>
+&nbsp;                {
+<b class="fc">&nbsp;                    flag = true;</b>
+<b class="fc">&nbsp;                    break;</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        if(flag)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            System.out.println(&quot;Pre-Requisite not cleared!&quot;);</b>
+<b class="fc">&nbsp;            return entry;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;insert into registrations values (?,?);&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, id);</b>
+<b class="fc">&nbsp;        ps.setString(2, entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select credits from student where entry_no = ?&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int cred = rs.getInt(&quot;credits&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select C from catalog where course_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int c = rs.getInt(&quot;C&quot;);</b>
+<b class="fc">&nbsp;        cred = cred + c;</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;UPDATE student SET credits = ? where entry_no = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setInt(1, cred);</b>
+<b class="fc">&nbsp;        ps.setString(2, entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from courses where course_id = ? AND branch = &#39;CS&#39;;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean is_core = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        if(!rs.next())</b>
+&nbsp;        {
+<b class="fc">&nbsp;            is_core = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from curriculum where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int core = rs.getInt(&quot;core&quot;);</b>
+<b class="fc">&nbsp;        int elec = rs.getInt(&quot;elec&quot;);</b>
+<b class="fc">&nbsp;        if(is_core)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            core +=c;</b>
+&nbsp;        }
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            elec+=c;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        sql = &quot;UPDATE curriculum SET core = ? , elec = ? where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setInt(1,core);</b>
+<b class="fc">&nbsp;        ps.setInt(2,elec);</b>
+<b class="fc">&nbsp;        ps.setString(3,entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Course Registered Successfully!&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String Deregister(Connection con, String entry) throws SQLException {
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+<b class="fc">&nbsp;        String sql = &quot;select course_id from registrations where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        ResultSet rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Courses List:&quot;);</b>
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            System.out.println(rs.getString(&quot;course_id&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Enter the Course ID you want to deregister&quot;);</b>
+&nbsp;        String id;
+<b class="fc">&nbsp;        id = sc.nextLine();</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;delete from registrations where course_id = ? AND student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, id);</b>
+<b class="fc">&nbsp;        ps.setString(2, entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select credits from student where entry_no = ?&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int cred = rs.getInt(&quot;credits&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select C from catalog where course_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int c = rs.getInt(&quot;C&quot;);</b>
+<b class="fc">&nbsp;        cred = cred - c;</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;UPDATE student SET credits = ? where entry_no = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setInt(1, cred);</b>
+<b class="fc">&nbsp;        ps.setString(2, entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from courses where course_id = ? AND branch = &#39;CS&#39;;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,id);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean is_core = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        if(!rs.next())</b>
+&nbsp;        {
+<b class="nc">&nbsp;            is_core = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from curriculum where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        int core = rs.getInt(&quot;core&quot;);</b>
+<b class="fc">&nbsp;        int elec = rs.getInt(&quot;elec&quot;);</b>
+<b class="fc">&nbsp;        if(is_core)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            core -=c;</b>
+&nbsp;        }
+&nbsp;        else
+&nbsp;        {
+<b class="nc">&nbsp;            elec-=c;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        sql = &quot;UPDATE curriculum SET core = ? , elec = ? where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setInt(1,core);</b>
+<b class="fc">&nbsp;        ps.setInt(2,elec);</b>
+<b class="fc">&nbsp;        ps.setString(3,entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Course Removed Successfully!&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int View_Grades(Connection con , String entry) throws SQLException {
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+<b class="fc">&nbsp;        String sql = &quot;select course_id,grade from grades where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        ResultSet rs = ps.executeQuery();</b>
+&nbsp;
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            System.out.println(rs.getString(&quot;course_id&quot;) + &quot;- &quot; + rs.getString(&quot;grade&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return 1;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public double Show_CGPA(Connection con, String entry) throws SQLException {
+<b class="fc">&nbsp;        double cgpa = 0;</b>
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+<b class="fc">&nbsp;        String sql = &quot;select g.grade,cat.C from grades as g, catalog as cat where cat.course_id = g.course_id and g.student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1, entry);</b>
+<b class="fc">&nbsp;        ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        double creds = 0, cumulative = 0;</b>
+&nbsp;        String gr;
+<b class="fc">&nbsp;        while (rs.next()) {</b>
+<b class="fc">&nbsp;            int x = rs.getInt(&quot;C&quot;);</b>
+<b class="fc">&nbsp;            creds += x;</b>
+<b class="fc">&nbsp;            gr = rs.getString(&quot;grade&quot;);</b>
+<b class="fc">&nbsp;            switch (gr) {</b>
+<b class="fc">&nbsp;                case &quot;A&quot; -&gt; cumulative += 10 * x;</b>
+<b class="fc">&nbsp;                case &quot;A-&quot; -&gt; cumulative += 9 * x;</b>
+<b class="fc">&nbsp;                case &quot;B&quot; -&gt; cumulative += 8 * x;</b>
+<b class="fc">&nbsp;                case &quot;B-&quot; -&gt; cumulative += 7 * x;</b>
+<b class="fc">&nbsp;                case &quot;C&quot; -&gt; cumulative += 6 * x;</b>
+<b class="fc">&nbsp;                case &quot;C-&quot; -&gt; cumulative += 5 * x;</b>
+<b class="fc">&nbsp;                case &quot;D&quot; -&gt; cumulative += 4 * x;</b>
+<b class="fc">&nbsp;                case &quot;E&quot; -&gt; cumulative += 3 * x;</b>
+&nbsp;            }
+<b class="fc">&nbsp;        }</b>
+&nbsp;
+<b class="fc">&nbsp;        cgpa = cumulative / creds;</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Current CGPA: &quot; + cgpa);</b>
+&nbsp;
+<b class="fc">&nbsp;        return cgpa;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String Update_Profile(Connection con, String entry) throws SQLException {
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+&nbsp;        String name, contact;
+&nbsp;        int batch;
+<b class="fc">&nbsp;        System.out.println(&quot;Enter Updated Name&quot;);</b>
+<b class="fc">&nbsp;        name = sc.nextLine();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Enter Updated Batch&quot;);</b>
+<b class="fc">&nbsp;        batch = sc.nextInt();</b>
+<b class="fc">&nbsp;        sc.nextLine();</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Enter Updated Contact&quot;);</b>
+<b class="fc">&nbsp;        contact = sc.nextLine();</b>
+&nbsp;
+<b class="fc">&nbsp;        String sql = &quot;update student SET name = ?, batch = ?, contact = ? where entry_no = ?;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,name);</b>
+<b class="fc">&nbsp;        ps.setInt(2,batch);</b>
+<b class="fc">&nbsp;        ps.setString(3,contact);</b>
+<b class="fc">&nbsp;        ps.setString(4,entry);</b>
+<b class="fc">&nbsp;        ps.executeUpdate();</b>
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Do you want to change Password?&quot;);</b>
+<b class="fc">&nbsp;        System.out.println(&quot;Press 1 for Yes , any other for No&quot;);</b>
+<b class="fc">&nbsp;        int flag = sc.nextInt();</b>
+<b class="fc">&nbsp;        sc.nextLine();</b>
+<b class="fc">&nbsp;        if(flag == 1)</b>
+&nbsp;        {
+&nbsp;            String pass;
+<b class="fc">&nbsp;            System.out.println(&quot;Enter New Password&quot;);</b>
+<b class="fc">&nbsp;            pass = sc.nextLine();</b>
+<b class="fc">&nbsp;            sql = &quot;select * from student where entry_no = ?;&quot;;</b>
+<b class="fc">&nbsp;            ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;            ps.setString(1,entry);</b>
+<b class="fc">&nbsp;            ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;            rs.next();</b>
+<b class="fc">&nbsp;            String email = rs.getString(&quot;email&quot;);</b>
+<b class="fc">&nbsp;            sql = &quot;update users SET password = ? where email = ?;&quot;;</b>
+<b class="fc">&nbsp;            ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;            ps.setString(1,pass);</b>
+<b class="fc">&nbsp;            ps.setString(2,email);</b>
+<b class="fc">&nbsp;            ps.executeUpdate();</b>
+&nbsp;
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        System.out.println(&quot;Profile Updated Successfully!&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;        return entry;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String Grad_Status(Connection con, String entry) throws SQLException {
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+&nbsp;        String op ;
+<b class="fc">&nbsp;        int core_reqd = 60;</b>
+<b class="fc">&nbsp;        int elec_reqd = 30;</b>
+<b class="fc">&nbsp;        String sql = &quot;select * from curriculum where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        PreparedStatement ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        rs.next();</b>
+<b class="fc">&nbsp;        boolean flag = true;</b>
+&nbsp;
+<b class="fc">&nbsp;        if(rs.getInt(&quot;core&quot;) &lt; core_reqd || rs.getInt(&quot;elec&quot;) &lt; elec_reqd)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            flag = false;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select * from grades where student_id = ?;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        while (rs.next())</b>
+&nbsp;        {
+<b class="fc">&nbsp;            if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</b>
+&nbsp;            {
+<b class="fc">&nbsp;                flag = false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select  * from grades where student_id = ? AND course_id = &#39;CP301&#39;;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        if(!rs.next())</b>
+<b class="fc">&nbsp;            flag = false;</b>
+<b class="fc">&nbsp;        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</b>
+<b class="fc">&nbsp;            flag = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select  * from grades where student_id = ? AND course_id = &#39;CP302&#39;;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        if(!rs.next())</b>
+<b class="fc">&nbsp;            flag = false;</b>
+<b class="fc">&nbsp;        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</b>
+<b class="fc">&nbsp;            flag = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        sql = &quot;select  * from grades where student_id = ? AND course_id = &#39;CP303&#39;;&quot;;</b>
+<b class="fc">&nbsp;        ps = con.prepareStatement(sql);</b>
+<b class="fc">&nbsp;        ps.setString(1,entry);</b>
+<b class="fc">&nbsp;        rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;        if(!rs.next())</b>
+<b class="fc">&nbsp;            flag = false;</b>
+<b class="fc">&nbsp;        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</b>
+<b class="fc">&nbsp;            flag = false;</b>
+&nbsp;
+<b class="fc">&nbsp;        if(!flag)</b>
+&nbsp;        {
+<b class="fc">&nbsp;            System.out.println(&quot;Required Credits Not Reached&quot;);</b>
+<b class="fc">&nbsp;            op = &quot;Required Credits Not Reached&quot;;</b>
+&nbsp;        }
+&nbsp;        else
+&nbsp;        {
+<b class="fc">&nbsp;            System.out.println(&quot;Credits Required for Graduation Completed!&quot;);</b>
+<b class="fc">&nbsp;            op = &quot;Credits Required for Graduation Completed!&quot;;</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return op;</b>
+&nbsp;    }
+&nbsp;    public String Home(Connection con, String entry) throws SQLException {
+&nbsp;
+&nbsp;        int ch;
+&nbsp;        while(true)
+&nbsp;        {
+<b class="fc">&nbsp;            Scanner sc = new Scanner(System.in);</b>
+<b class="fc">&nbsp;            System.out.println();</b>
+<b class="fc">&nbsp;            System.out.println(&quot;1. Register Course&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;2. Deregister Course&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;3. View Grades&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;4. Show CGPA&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;5. Update Profile&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;6. Check Graduation Status&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;7. Logout&quot;);</b>
+<b class="fc">&nbsp;            System.out.print(&quot;Enter Your Choice:&quot;);</b>
+<b class="fc">&nbsp;            ch = sc.nextInt();</b>
+<b class="fc">&nbsp;            sc.nextLine();</b>
+<b class="fc">&nbsp;            if (ch &lt; 1 || ch &gt; 7)</b>
+&nbsp;            {
+<b class="fc">&nbsp;                while (ch &lt; 1 || ch &gt; 7)</b>
+&nbsp;                {
+<b class="fc">&nbsp;                    System.out.println(&quot;Enter correct Choice&quot;);</b>
+<b class="fc">&nbsp;                    ch = sc.nextInt();</b>
+<b class="fc">&nbsp;                    sc.nextLine();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="fc">&nbsp;            if (ch == 1)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                Register(con,entry);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            else if (ch == 2)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                Deregister(con, entry);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            else if (ch == 3)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                View_Grades(con, entry);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            else if(ch == 4)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                Show_CGPA(con, entry);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            else if(ch == 5)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                Update_Profile(con, entry);</b>
+&nbsp;            }
+<b class="fc">&nbsp;            else if(ch == 6)</b>
+&nbsp;            {
+<b class="nc">&nbsp;                Grad_Status(con, entry);</b>
+&nbsp;            }
+&nbsp;            else
+&nbsp;            {
+<b class="fc">&nbsp;                return entry;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-07 21:27</div>
+</div>
+</body>
+</html>

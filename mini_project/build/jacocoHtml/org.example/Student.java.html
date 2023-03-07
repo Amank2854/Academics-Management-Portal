@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Student.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mini_project</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Student.java</span></div><h1>Student.java</h1><pre class="source lang-java linenums">
+
+package org.example;
+import java.sql.Connection;
+import java.util.*;
+import java.sql.*;
+<span class="fc" id="L7">public class Student</span>
+{
+    public String Register(Connection con, String entry) throws SQLException {
+<span class="fc" id="L10">        Scanner sc = new Scanner(System.in);</span>
+<span class="fc" id="L11">        String sql = &quot;select DISTINCT o.course_id from offerings as o where o.course_id NOT IN (select r.course_id from registrations as r where r.student_id = ?) order by o.course_id;&quot;;</span>
+<span class="fc" id="L12">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L13">        ps.setString(1, entry);</span>
+<span class="fc" id="L14">        ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L16">        System.out.println(&quot;Courses List:&quot;);</span>
+<span class="fc bfc" id="L17" title="All 2 branches covered.">        while (rs.next()) {</span>
+<span class="fc" id="L18">            System.out.println(rs.getString(&quot;course_id&quot;));</span>
+        }
+
+        //Check for Credits left
+
+<span class="fc" id="L23">        System.out.println(&quot;Enter the Course ID you want to register&quot;);</span>
+        String id;
+<span class="fc" id="L25">        id = sc.nextLine();</span>
+
+<span class="fc" id="L27">        sql = &quot;select * from student where entry_no = ?;&quot;;</span>
+<span class="fc" id="L28">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L29">        ps.setString(1, entry);</span>
+<span class="fc" id="L30">        rs = ps.executeQuery();</span>
+<span class="fc" id="L31">        rs.next();</span>
+<span class="fc" id="L32">        int present_credits = rs.getInt(&quot;credits&quot;);</span>
+<span class="fc" id="L33">        int prev_1 = rs.getInt(&quot;cred_prev&quot;);</span>
+<span class="fc" id="L34">        int prev_2 = rs.getInt(&quot;cred_prev_2&quot;);</span>
+
+<span class="fc" id="L36">        sql = &quot;select C from catalog where course_id = ?;&quot;;</span>
+<span class="fc" id="L37">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L38">        ps.setString(1, id);</span>
+<span class="fc" id="L39">        rs = ps.executeQuery();</span>
+<span class="fc" id="L40">        rs.next();</span>
+<span class="fc" id="L41">        int course_creds = rs.getInt(&quot;C&quot;);</span>
+
+<span class="pc bpc" id="L43" title="1 of 4 branches missed.">        if (course_creds + present_credits &gt; 24 || present_credits + course_creds &gt; (prev_1 + prev_2) / 2) {</span>
+<span class="fc" id="L44">            System.out.println(&quot;Credits Limit Exceeded&quot;);</span>
+<span class="fc" id="L45">            return entry;</span>
+        }
+
+<span class="fc" id="L48">        sql = &quot;select * from prerequisite where course_id = ?;&quot;;</span>
+<span class="fc" id="L49">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L50">        ps.setString(1,id);</span>
+<span class="fc" id="L51">        rs = ps.executeQuery();</span>
+
+<span class="fc" id="L53">        ArrayList&lt;String&gt; pre_req = new ArrayList&lt;String&gt;();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        while (rs.next())</span>
+        {
+<span class="fc" id="L56">            pre_req.add(rs.getString(&quot;reqd_id&quot;));</span>
+        }
+
+<span class="fc" id="L59">        boolean flag = false;</span>
+
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        for(String s : pre_req)</span>
+        {
+<span class="fc" id="L63">            sql = &quot;select * from grades where course_id = ? and student_id = ?;&quot;;</span>
+<span class="fc" id="L64">            ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L65">            ps.setString(1,s);</span>
+<span class="fc" id="L66">            ps.setString(2,entry);</span>
+<span class="fc" id="L67">            rs = ps.executeQuery();</span>
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">            if(!rs.next())</span>
+            {
+<span class="nc" id="L70">                flag = true;</span>
+<span class="nc" id="L71">                break;</span>
+            }
+            else
+            {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">                if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</span>
+                {
+<span class="fc" id="L77">                    flag = true;</span>
+<span class="fc" id="L78">                    break;</span>
+                }
+            }
+<span class="fc" id="L81">        }</span>
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if(flag)</span>
+        {
+<span class="fc" id="L85">            System.out.println(&quot;Pre-Requisite not cleared!&quot;);</span>
+<span class="fc" id="L86">            return entry;</span>
+        }
+
+
+<span class="fc" id="L90">        sql = &quot;insert into registrations values (?,?);&quot;;</span>
+<span class="fc" id="L91">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L92">        ps.setString(1, id);</span>
+<span class="fc" id="L93">        ps.setString(2, entry);</span>
+<span class="fc" id="L94">        ps.executeUpdate();</span>
+
+
+<span class="fc" id="L97">        sql = &quot;select credits from student where entry_no = ?&quot;;</span>
+<span class="fc" id="L98">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L99">        ps.setString(1, entry);</span>
+<span class="fc" id="L100">        rs = ps.executeQuery();</span>
+<span class="fc" id="L101">        rs.next();</span>
+<span class="fc" id="L102">        int cred = rs.getInt(&quot;credits&quot;);</span>
+
+<span class="fc" id="L104">        sql = &quot;select C from catalog where course_id = ?;&quot;;</span>
+<span class="fc" id="L105">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L106">        ps.setString(1, id);</span>
+<span class="fc" id="L107">        rs = ps.executeQuery();</span>
+<span class="fc" id="L108">        rs.next();</span>
+<span class="fc" id="L109">        int c = rs.getInt(&quot;C&quot;);</span>
+<span class="fc" id="L110">        cred = cred + c;</span>
+
+<span class="fc" id="L112">        sql = &quot;UPDATE student SET credits = ? where entry_no = ?;&quot;;</span>
+<span class="fc" id="L113">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L114">        ps.setInt(1, cred);</span>
+<span class="fc" id="L115">        ps.setString(2, entry);</span>
+<span class="fc" id="L116">        ps.executeUpdate();</span>
+
+<span class="fc" id="L118">        sql = &quot;select * from courses where course_id = ? AND branch = 'CS';&quot;;</span>
+<span class="fc" id="L119">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L120">        ps.setString(1,id);</span>
+<span class="fc" id="L121">        rs = ps.executeQuery();</span>
+
+<span class="fc" id="L123">        boolean is_core = true;</span>
+
+<span class="fc bfc" id="L125" title="All 2 branches covered.">        if(!rs.next())</span>
+        {
+<span class="fc" id="L127">            is_core = false;</span>
+        }
+
+<span class="fc" id="L130">        sql = &quot;select * from curriculum where student_id = ?;&quot;;</span>
+<span class="fc" id="L131">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L132">        ps.setString(1,entry);</span>
+<span class="fc" id="L133">        rs = ps.executeQuery();</span>
+<span class="fc" id="L134">        rs.next();</span>
+<span class="fc" id="L135">        int core = rs.getInt(&quot;core&quot;);</span>
+<span class="fc" id="L136">        int elec = rs.getInt(&quot;elec&quot;);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if(is_core)</span>
+        {
+<span class="fc" id="L139">            core +=c;</span>
+        }
+        else
+        {
+<span class="fc" id="L143">            elec+=c;</span>
+        }
+<span class="fc" id="L145">        sql = &quot;UPDATE curriculum SET core = ? , elec = ? where student_id = ?;&quot;;</span>
+<span class="fc" id="L146">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L147">        ps.setInt(1,core);</span>
+<span class="fc" id="L148">        ps.setInt(2,elec);</span>
+<span class="fc" id="L149">        ps.setString(3,entry);</span>
+<span class="fc" id="L150">        ps.executeUpdate();</span>
+
+<span class="fc" id="L152">        System.out.println(&quot;Course Registered Successfully!&quot;);</span>
+
+<span class="fc" id="L154">        return entry;</span>
+    }
+
+    public String Deregister(Connection con, String entry) throws SQLException {
+<span class="fc" id="L158">        Scanner sc = new Scanner(System.in);</span>
+<span class="fc" id="L159">        String sql = &quot;select course_id from registrations where student_id = ?;&quot;;</span>
+<span class="fc" id="L160">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L161">        ps.setString(1, entry);</span>
+<span class="fc" id="L162">        ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc" id="L164">        System.out.println(&quot;Courses List:&quot;);</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        while (rs.next()) {</span>
+<span class="fc" id="L166">            System.out.println(rs.getString(&quot;course_id&quot;));</span>
+        }
+
+<span class="fc" id="L169">        System.out.println(&quot;Enter the Course ID you want to deregister&quot;);</span>
+        String id;
+<span class="fc" id="L171">        id = sc.nextLine();</span>
+
+<span class="fc" id="L173">        sql = &quot;delete from registrations where course_id = ? AND student_id = ?;&quot;;</span>
+<span class="fc" id="L174">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L175">        ps.setString(1, id);</span>
+<span class="fc" id="L176">        ps.setString(2, entry);</span>
+<span class="fc" id="L177">        ps.executeUpdate();</span>
+
+<span class="fc" id="L179">        sql = &quot;select credits from student where entry_no = ?&quot;;</span>
+<span class="fc" id="L180">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L181">        ps.setString(1, entry);</span>
+<span class="fc" id="L182">        rs = ps.executeQuery();</span>
+<span class="fc" id="L183">        rs.next();</span>
+<span class="fc" id="L184">        int cred = rs.getInt(&quot;credits&quot;);</span>
+
+<span class="fc" id="L186">        sql = &quot;select C from catalog where course_id = ?;&quot;;</span>
+<span class="fc" id="L187">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L188">        ps.setString(1, id);</span>
+<span class="fc" id="L189">        rs = ps.executeQuery();</span>
+<span class="fc" id="L190">        rs.next();</span>
+<span class="fc" id="L191">        int c = rs.getInt(&quot;C&quot;);</span>
+<span class="fc" id="L192">        cred = cred - c;</span>
+
+<span class="fc" id="L194">        sql = &quot;UPDATE student SET credits = ? where entry_no = ?;&quot;;</span>
+<span class="fc" id="L195">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L196">        ps.setInt(1, cred);</span>
+<span class="fc" id="L197">        ps.setString(2, entry);</span>
+<span class="fc" id="L198">        ps.executeUpdate();</span>
+
+<span class="fc" id="L200">        sql = &quot;select * from courses where course_id = ? AND branch = 'CS';&quot;;</span>
+<span class="fc" id="L201">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L202">        ps.setString(1,id);</span>
+<span class="fc" id="L203">        rs = ps.executeQuery();</span>
+
+<span class="fc" id="L205">        boolean is_core = true;</span>
+
+<span class="pc bpc" id="L207" title="1 of 2 branches missed.">        if(!rs.next())</span>
+        {
+<span class="nc" id="L209">            is_core = false;</span>
+        }
+
+<span class="fc" id="L212">        sql = &quot;select * from curriculum where student_id = ?;&quot;;</span>
+<span class="fc" id="L213">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L214">        ps.setString(1,entry);</span>
+<span class="fc" id="L215">        rs = ps.executeQuery();</span>
+<span class="fc" id="L216">        rs.next();</span>
+<span class="fc" id="L217">        int core = rs.getInt(&quot;core&quot;);</span>
+<span class="fc" id="L218">        int elec = rs.getInt(&quot;elec&quot;);</span>
+<span class="pc bpc" id="L219" title="1 of 2 branches missed.">        if(is_core)</span>
+        {
+<span class="fc" id="L221">            core -=c;</span>
+        }
+        else
+        {
+<span class="nc" id="L225">            elec-=c;</span>
+        }
+<span class="fc" id="L227">        sql = &quot;UPDATE curriculum SET core = ? , elec = ? where student_id = ?;&quot;;</span>
+<span class="fc" id="L228">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L229">        ps.setInt(1,core);</span>
+<span class="fc" id="L230">        ps.setInt(2,elec);</span>
+<span class="fc" id="L231">        ps.setString(3,entry);</span>
+<span class="fc" id="L232">        ps.executeUpdate();</span>
+
+<span class="fc" id="L234">        System.out.println(&quot;Course Removed Successfully!&quot;);</span>
+
+<span class="fc" id="L236">        return entry;</span>
+    }
+
+    public int View_Grades(Connection con , String entry) throws SQLException {
+<span class="fc" id="L240">        Scanner sc = new Scanner(System.in);</span>
+<span class="fc" id="L241">        String sql = &quot;select course_id,grade from grades where student_id = ?;&quot;;</span>
+<span class="fc" id="L242">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L243">        ps.setString(1, entry);</span>
+<span class="fc" id="L244">        ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        while (rs.next()) {</span>
+<span class="fc" id="L247">            System.out.println(rs.getString(&quot;course_id&quot;) + &quot;- &quot; + rs.getString(&quot;grade&quot;));</span>
+        }
+
+<span class="fc" id="L250">        return 1;</span>
+    }
+
+    public double Show_CGPA(Connection con, String entry) throws SQLException {
+<span class="fc" id="L254">        double cgpa = 0;</span>
+<span class="fc" id="L255">        Scanner sc = new Scanner(System.in);</span>
+<span class="fc" id="L256">        String sql = &quot;select g.grade,cat.C from grades as g, catalog as cat where cat.course_id = g.course_id and g.student_id = ?;&quot;;</span>
+<span class="fc" id="L257">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L258">        ps.setString(1, entry);</span>
+<span class="fc" id="L259">        ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L260">        double creds = 0, cumulative = 0;</span>
+        String gr;
+<span class="fc bfc" id="L262" title="All 2 branches covered.">        while (rs.next()) {</span>
+<span class="fc" id="L263">            int x = rs.getInt(&quot;C&quot;);</span>
+<span class="fc" id="L264">            creds += x;</span>
+<span class="fc" id="L265">            gr = rs.getString(&quot;grade&quot;);</span>
+<span class="fc bfc" id="L266" title="All 9 branches covered.">            switch (gr) {</span>
+<span class="fc" id="L267">                case &quot;A&quot; -&gt; cumulative += 10 * x;</span>
+<span class="fc" id="L268">                case &quot;A-&quot; -&gt; cumulative += 9 * x;</span>
+<span class="fc" id="L269">                case &quot;B&quot; -&gt; cumulative += 8 * x;</span>
+<span class="fc" id="L270">                case &quot;B-&quot; -&gt; cumulative += 7 * x;</span>
+<span class="fc" id="L271">                case &quot;C&quot; -&gt; cumulative += 6 * x;</span>
+<span class="fc" id="L272">                case &quot;C-&quot; -&gt; cumulative += 5 * x;</span>
+<span class="fc" id="L273">                case &quot;D&quot; -&gt; cumulative += 4 * x;</span>
+<span class="fc" id="L274">                case &quot;E&quot; -&gt; cumulative += 3 * x;</span>
+            }
+<span class="fc" id="L276">        }</span>
+
+<span class="fc" id="L278">        cgpa = cumulative / creds;</span>
+<span class="fc" id="L279">        System.out.println(&quot;Current CGPA: &quot; + cgpa);</span>
+
+<span class="fc" id="L281">        return cgpa;</span>
+    }
+
+    public String Update_Profile(Connection con, String entry) throws SQLException {
+<span class="fc" id="L285">        Scanner sc = new Scanner(System.in);</span>
+        String name, contact;
+        int batch;
+<span class="fc" id="L288">        System.out.println(&quot;Enter Updated Name&quot;);</span>
+<span class="fc" id="L289">        name = sc.nextLine();</span>
+<span class="fc" id="L290">        System.out.println(&quot;Enter Updated Batch&quot;);</span>
+<span class="fc" id="L291">        batch = sc.nextInt();</span>
+<span class="fc" id="L292">        sc.nextLine();</span>
+<span class="fc" id="L293">        System.out.println(&quot;Enter Updated Contact&quot;);</span>
+<span class="fc" id="L294">        contact = sc.nextLine();</span>
+
+<span class="fc" id="L296">        String sql = &quot;update student SET name = ?, batch = ?, contact = ? where entry_no = ?;&quot;;</span>
+<span class="fc" id="L297">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L298">        ps.setString(1,name);</span>
+<span class="fc" id="L299">        ps.setInt(2,batch);</span>
+<span class="fc" id="L300">        ps.setString(3,contact);</span>
+<span class="fc" id="L301">        ps.setString(4,entry);</span>
+<span class="fc" id="L302">        ps.executeUpdate();</span>
+
+<span class="fc" id="L304">        System.out.println(&quot;Do you want to change Password?&quot;);</span>
+<span class="fc" id="L305">        System.out.println(&quot;Press 1 for Yes , any other for No&quot;);</span>
+<span class="fc" id="L306">        int flag = sc.nextInt();</span>
+<span class="fc" id="L307">        sc.nextLine();</span>
+<span class="pc bpc" id="L308" title="1 of 2 branches missed.">        if(flag == 1)</span>
+        {
+            String pass;
+<span class="fc" id="L311">            System.out.println(&quot;Enter New Password&quot;);</span>
+<span class="fc" id="L312">            pass = sc.nextLine();</span>
+<span class="fc" id="L313">            sql = &quot;select * from student where entry_no = ?;&quot;;</span>
+<span class="fc" id="L314">            ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L315">            ps.setString(1,entry);</span>
+<span class="fc" id="L316">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L317">            rs.next();</span>
+<span class="fc" id="L318">            String email = rs.getString(&quot;email&quot;);</span>
+<span class="fc" id="L319">            sql = &quot;update users SET password = ? where email = ?;&quot;;</span>
+<span class="fc" id="L320">            ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L321">            ps.setString(1,pass);</span>
+<span class="fc" id="L322">            ps.setString(2,email);</span>
+<span class="fc" id="L323">            ps.executeUpdate();</span>
+
+        }
+
+<span class="fc" id="L327">        System.out.println(&quot;Profile Updated Successfully!&quot;);</span>
+
+<span class="fc" id="L329">        return entry;</span>
+    }
+
+    public String Grad_Status(Connection con, String entry) throws SQLException {
+<span class="fc" id="L333">        Scanner sc = new Scanner(System.in);</span>
+        String op ;
+<span class="fc" id="L335">        int core_reqd = 60;</span>
+<span class="fc" id="L336">        int elec_reqd = 30;</span>
+<span class="fc" id="L337">        String sql = &quot;select * from curriculum where student_id = ?;&quot;;</span>
+<span class="fc" id="L338">        PreparedStatement ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L339">        ps.setString(1,entry);</span>
+<span class="fc" id="L340">        ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L341">        rs.next();</span>
+<span class="fc" id="L342">        boolean flag = true;</span>
+
+<span class="pc bpc" id="L344" title="1 of 4 branches missed.">        if(rs.getInt(&quot;core&quot;) &lt; core_reqd || rs.getInt(&quot;elec&quot;) &lt; elec_reqd)</span>
+        {
+<span class="fc" id="L346">            flag = false;</span>
+        }
+
+<span class="fc" id="L349">        sql = &quot;select * from grades where student_id = ?;&quot;;</span>
+<span class="fc" id="L350">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L351">        ps.setString(1,entry);</span>
+<span class="fc" id="L352">        rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L353" title="All 2 branches covered.">        while (rs.next())</span>
+        {
+<span class="fc bfc" id="L355" title="All 2 branches covered.">            if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</span>
+            {
+<span class="fc" id="L357">                flag = false;</span>
+            }
+        }
+
+<span class="fc" id="L361">        sql = &quot;select  * from grades where student_id = ? AND course_id = 'CP301';&quot;;</span>
+<span class="fc" id="L362">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L363">        ps.setString(1,entry);</span>
+<span class="fc" id="L364">        rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L365" title="All 2 branches covered.">        if(!rs.next())</span>
+<span class="fc" id="L366">            flag = false;</span>
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</span>
+<span class="fc" id="L368">            flag = false;</span>
+
+<span class="fc" id="L370">        sql = &quot;select  * from grades where student_id = ? AND course_id = 'CP302';&quot;;</span>
+<span class="fc" id="L371">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L372">        ps.setString(1,entry);</span>
+<span class="fc" id="L373">        rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L374" title="All 2 branches covered.">        if(!rs.next())</span>
+<span class="fc" id="L375">            flag = false;</span>
+<span class="fc bfc" id="L376" title="All 2 branches covered.">        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</span>
+<span class="fc" id="L377">            flag = false;</span>
+
+<span class="fc" id="L379">        sql = &quot;select  * from grades where student_id = ? AND course_id = 'CP303';&quot;;</span>
+<span class="fc" id="L380">        ps = con.prepareStatement(sql);</span>
+<span class="fc" id="L381">        ps.setString(1,entry);</span>
+<span class="fc" id="L382">        rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">        if(!rs.next())</span>
+<span class="fc" id="L384">            flag = false;</span>
+<span class="fc bfc" id="L385" title="All 2 branches covered.">        else if(rs.getString(&quot;grade&quot;).equals(&quot;F&quot;))</span>
+<span class="fc" id="L386">            flag = false;</span>
+
+<span class="fc bfc" id="L388" title="All 2 branches covered.">        if(!flag)</span>
+        {
+<span class="fc" id="L390">            System.out.println(&quot;Required Credits Not Reached&quot;);</span>
+<span class="fc" id="L391">            op = &quot;Required Credits Not Reached&quot;;</span>
+        }
+        else
+        {
+<span class="fc" id="L395">            System.out.println(&quot;Credits Required for Graduation Completed!&quot;);</span>
+<span class="fc" id="L396">            op = &quot;Credits Required for Graduation Completed!&quot;;</span>
+        }
+
+<span class="fc" id="L399">        return op;</span>
+    }
+    public String Home(Connection con, String entry) throws SQLException {
+
+        int ch;
+        while(true)
+        {
+<span class="fc" id="L406">            Scanner sc = new Scanner(System.in);</span>
+<span class="fc" id="L407">            System.out.println();</span>
+<span class="fc" id="L408">            System.out.println(&quot;1. Register Course&quot;);</span>
+<span class="fc" id="L409">            System.out.println(&quot;2. Deregister Course&quot;);</span>
+<span class="fc" id="L410">            System.out.println(&quot;3. View Grades&quot;);</span>
+<span class="fc" id="L411">            System.out.println(&quot;4. Show CGPA&quot;);</span>
+<span class="fc" id="L412">            System.out.println(&quot;5. Update Profile&quot;);</span>
+<span class="fc" id="L413">            System.out.println(&quot;6. Check Graduation Status&quot;);</span>
+<span class="fc" id="L414">            System.out.println(&quot;7. Logout&quot;);</span>
+<span class="fc" id="L415">            System.out.print(&quot;Enter Your Choice:&quot;);</span>
+<span class="fc" id="L416">            ch = sc.nextInt();</span>
+<span class="fc" id="L417">            sc.nextLine();</span>
+<span class="pc bpc" id="L418" title="2 of 4 branches missed.">            if (ch &lt; 1 || ch &gt; 7)</span>
+            {
+<span class="pc bpc" id="L420" title="1 of 4 branches missed.">                while (ch &lt; 1 || ch &gt; 7)</span>
+                {
+<span class="fc" id="L422">                    System.out.println(&quot;Enter correct Choice&quot;);</span>
+<span class="fc" id="L423">                    ch = sc.nextInt();</span>
+<span class="fc" id="L424">                    sc.nextLine();</span>
+                }
+            }
+<span class="pc bpc" id="L427" title="1 of 2 branches missed.">            if (ch == 1)</span>
+            {
+<span class="nc" id="L429">                Register(con,entry);</span>
+            }
+<span class="pc bpc" id="L431" title="1 of 2 branches missed.">            else if (ch == 2)</span>
+            {
+<span class="nc" id="L433">                Deregister(con, entry);</span>
+            }
+<span class="pc bpc" id="L435" title="1 of 2 branches missed.">            else if (ch == 3)</span>
+            {
+<span class="nc" id="L437">                View_Grades(con, entry);</span>
+            }
+<span class="pc bpc" id="L439" title="1 of 2 branches missed.">            else if(ch == 4)</span>
+            {
+<span class="nc" id="L441">                Show_CGPA(con, entry);</span>
+            }
+<span class="pc bpc" id="L443" title="1 of 2 branches missed.">            else if(ch == 5)</span>
+            {
+<span class="nc" id="L445">                Update_Profile(con, entry);</span>
+            }
+<span class="pc bpc" id="L447" title="1 of 2 branches missed.">            else if(ch == 6)</span>
+            {
+<span class="nc" id="L449">                Grad_Status(con, entry);</span>
+            }
+            else
+            {
+<span class="fc" id="L453">                return entry;</span>
+            }
+<span class="nc" id="L455">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

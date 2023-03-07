@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DBinit.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">mini_project</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">DBinit.java</span></div><h1>DBinit.java</h1><pre class="source lang-java linenums">package org.example;
+
+import java.io.*;
+import java.sql.*;
+
+<span class="fc" id="L6">public class DBinit</span>
+{
+
+    static void executeSql(File file, Connection connection)
+    {
+        try
+        {
+<span class="fc" id="L13">            System.out.println(file.getName());</span>
+<span class="fc" id="L14">            Statement statement = connection.createStatement();</span>
+<span class="fc" id="L15">            String sql = &quot;&quot;;</span>
+<span class="fc" id="L16">            try (FileReader fileReaderObj = new FileReader(file))</span>
+            {
+                char cur;
+<span class="fc bfc" id="L19" title="All 2 branches covered.">                while ((cur = (char) fileReaderObj.read()) != (char) -1)</span>
+                {
+<span class="fc" id="L21">                    sql = sql + cur;</span>
+                }
+<span class="nc" id="L23">            } catch (IOException e)</span>
+            {
+<span class="nc" id="L25">                System.err.println(e.getMessage());</span>
+<span class="fc" id="L26">            }</span>
+<span class="fc" id="L27">            statement.executeUpdate(sql);</span>
+<span class="fc" id="L28">            statement.close();</span>
+        }
+<span class="nc" id="L30">        catch (Exception e)</span>
+        {
+<span class="nc" id="L32">            System.out.println(file.getName() + &quot;: &quot; + e.getMessage());</span>
+<span class="fc" id="L33">        }</span>
+<span class="fc" id="L34">    }</span>
+
+    public void connect()
+    {
+
+<span class="fc" id="L39">        final String DB_URL_1 = &quot;jdbc:postgresql://localhost/postgres&quot;;</span>
+<span class="fc" id="L40">        final String DB_URL_2 = &quot;jdbc:postgresql://localhost/mini_project&quot;;</span>
+<span class="fc" id="L41">        final String USER = &quot;postgres&quot;;</span>
+<span class="fc" id="L42">        final String PASSWORD = &quot;aman123456789000&quot;;</span>
+
+        try
+        {
+<span class="fc" id="L46">            Connection connection_2 = DriverManager.getConnection(DB_URL_2, USER, PASSWORD);</span>
+<span class="fc" id="L47">            System.out.println(&quot;Successfully connected to the database: &quot; + DB_URL_2);</span>
+<span class="fc" id="L48">            String filePath = new File(&quot;&quot;).getAbsolutePath() + &quot;/sql/queries.txt&quot;;</span>
+<span class="fc" id="L49">            File file = new File(filePath);</span>
+<span class="fc" id="L50">            executeSql(file, connection_2);</span>
+<span class="fc" id="L51">            System.out.println(&quot;Executed Successfully&quot;);</span>
+<span class="fc" id="L52">            connection_2.close();</span>
+        }
+<span class="nc" id="L54">        catch (Exception e)</span>
+        {
+<span class="nc" id="L56">            System.err.println(e.getMessage());</span>
+<span class="fc" id="L57">        }</span>
+<span class="fc" id="L58">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

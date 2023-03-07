@@ -1,0 +1,90 @@
+CREATE TABLE IF NOT EXISTS student (
+    entry_no VARCHAR(12) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    branch VARCHAR(2) NOT NULL,
+    batch int NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    credits int NOT NULL,
+    cred_prev int NOT NULL,
+    cred_prev_2 int NOT NULL,
+    PRIMARY KEY (entry_no)
+);
+
+CREATE TABLE IF NOT EXISTS faculty (
+    fac_id VARCHAR(12) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    name VARCHAR(30) NOT NULL,
+    join_date DATE NOT NULL,
+    contact VARCHAR(20) NOT NULL,
+    department VARCHAR(2) NOT NULL,
+    PRIMARY KEY (fac_id)
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    type VARCHAR(10) NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(80) NOT NULL,
+    PRIMARY KEY (email)
+);
+
+CREATE TABLE IF NOT EXISTS catalog (
+    course_id VARCHAR(10) NOT NULL,
+    L int NOT NULL,
+    T int NOT NULL,
+    P int NOT NULL,
+    C int NOT NULL,
+    dept VARCHAR(10),
+    PRIMARY KEY (course_id)
+);
+
+CREATE TABLE IF NOT EXISTS prerequisite (
+    course_id VARCHAR(10) NOT NULL,
+    reqd_id VARCHAR(10) NOT NULL,
+    PRIMARY KEY(course_id,reqd_id)
+);
+
+CREATE TABLE IF NOT EXISTS grades (
+    course_id VARCHAR(10) NOT NULL,
+    student_id VARCHAR(12) NOT NULL,
+    grade VARCHAR(10) NOT NULL,
+    PRIMARY KEY(course_id,student_id)
+);
+
+CREATE TABLE IF NOT EXISTS registrations (
+    course_id VARCHAR(10) NOT NULL,
+    student_id VARCHAR(12) NOT NULL,
+    PRIMARY KEY(course_id,student_id)
+);
+
+CREATE TABLE IF NOT EXISTS criteria (
+    course_id VARCHAR(10) NOT NULL,
+    reqd_cg REAL NOT NULL,
+    PRIMARY KEY(course_id)
+);
+
+CREATE TABLE IF NOT EXISTS curriculum (
+    student_id VARCHAR(12) NOT NULL,
+    core int NOT NULL,
+    elec int NOT NULL,
+    PRIMARY KEY(student_id)
+);
+
+CREATE TABLE IF NOT EXISTS offerings (
+    course_id VARCHAR(10) NOT NULL,
+    fac_id VARCHAR(10) NOT NULL,
+    PRIMARY KEY(course_id)
+);
+
+CREATE TABLE IF NOT EXISTS event (
+    sem int NOT NULL,
+    year int NOT NULL,
+    PRIMARY KEY(sem,year)
+);
+
+CREATE TABLE IF NOT EXISTS courses (
+    course_id VARCHAR(10) NOT NULL,
+    branch VARCHAR(10) NOT NULL,
+    PRIMARY KEY(course_id,branch)
+);
+

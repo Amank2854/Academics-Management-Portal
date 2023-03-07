@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.example.AcadTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2023-03-07T16:48:06" hostname="LAPTOP-MA03V1M3" time="0.257">
+  <properties/>
+  <testcase name="edit_Catalog()" classname="org.example.AcadTest" time="0.097"/>
+  <testcase name="grad_Status()" classname="org.example.AcadTest" time="0.086"/>
+  <testcase name="view_Grades()" classname="org.example.AcadTest" time="0.005"/>
+  <testcase name="update_Sem()" classname="org.example.AcadTest" time="0.031"/>
+  <testcase name="generate_Transcript()" classname="org.example.AcadTest" time="0.024"/>
+  <testcase name="home()" classname="org.example.AcadTest" time="0.003"/>
+  <system-out><![CDATA[Successfully connected to the database: jdbc:postgresql://localhost/mini_project
+queries.txt
+Executed Successfully
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

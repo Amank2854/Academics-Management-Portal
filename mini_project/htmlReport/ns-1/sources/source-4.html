@@ -1,0 +1,239 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <title>Coverage Report > Main</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.example</a>
+</div>
+
+<h1>Coverage Summary for Class: Main (org.example)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Main</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    66.7%
+  </span>
+  <span class="absValue">
+    (2/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    93.9%
+  </span>
+  <span class="absValue">
+    (92/98)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.example;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.util.*;
+&nbsp;import java.sql.*;
+<b class="fc">&nbsp;public class Main</b>
+&nbsp;{
+&nbsp;    public static String main()
+&nbsp;    {
+<b class="fc">&nbsp;        final String DB_URL_2 = &quot;jdbc:postgresql://localhost/mini_project&quot;;</b>
+<b class="fc">&nbsp;        final String USER = &quot;postgres&quot;;</b>
+<b class="fc">&nbsp;        final String PASSWORD = &quot;aman123456789000&quot;;</b>
+<b class="fc">&nbsp;        DBinit db = new DBinit();</b>
+<b class="fc">&nbsp;        db.connect();</b>
+<b class="fc">&nbsp;        Scanner sc = new Scanner(System.in);</b>
+&nbsp;        int Choice;
+&nbsp;        while(true) {
+<b class="fc">&nbsp;            System.out.println(&quot;Enter 1 for Student, 2 for Faculty and 3 for Academic Office!&quot;);</b>
+<b class="fc">&nbsp;            System.out.println(&quot;Enter 4 to exit&quot;);</b>
+<b class="fc">&nbsp;            Choice = sc.nextInt();</b>
+<b class="fc">&nbsp;            sc.nextLine();</b>
+<b class="fc">&nbsp;            if (Choice &lt; 1 || Choice &gt; 4)</b>
+<b class="fc">&nbsp;                System.out.println(&quot;Wrong Input&quot;);</b>
+<b class="fc">&nbsp;            else if(Choice == 4)</b>
+<b class="fc">&nbsp;                return &quot;1&quot;;</b>
+&nbsp;            else {
+&nbsp;                String Email_id, password;
+<b class="fc">&nbsp;                if (Choice == 1) {</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        Connection connection_2 = DriverManager.getConnection(DB_URL_2, USER, PASSWORD);</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Email: &quot;);</b>
+<b class="fc">&nbsp;                        Email_id = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Password: &quot;);</b>
+<b class="fc">&nbsp;                        password = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        String sql = &quot;select * from users WHERE email = ?;&quot;;</b>
+<b class="fc">&nbsp;                        PreparedStatement ps = connection_2.prepareStatement(sql);</b>
+<b class="fc">&nbsp;                        ps.setString(1, Email_id);</b>
+<b class="fc">&nbsp;                        ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;                        while (rs.next()) {</b>
+<b class="fc">&nbsp;                            if (!rs.getString(&quot;type&quot;).equals(&quot;student&quot;)) {</b>
+<b class="fc">&nbsp;                                System.out.println(&quot;Invalid User Selection&quot;);</b>
+&nbsp;                            } else {
+<b class="fc">&nbsp;                                if (!rs.getString(&quot;email&quot;).equals(Email_id) || !rs.getString(&quot;password&quot;).equals(password)) {</b>
+<b class="fc">&nbsp;                                    System.out.println(&quot;Wrong Email or Password!&quot;);</b>
+&nbsp;                                } else {
+<b class="fc">&nbsp;                                    Student ob = new Student();</b>
+<b class="fc">&nbsp;                                    String sql1 = &quot;select * from student where email = ?;&quot;;</b>
+<b class="fc">&nbsp;                                    PreparedStatement ps1 = connection_2.prepareStatement(sql1);</b>
+<b class="fc">&nbsp;                                    ps1.setString(1, Email_id);</b>
+<b class="fc">&nbsp;                                    ResultSet rs1 = ps1.executeQuery();</b>
+<b class="fc">&nbsp;                                    rs1.next();</b>
+<b class="fc">&nbsp;                                    String entry_no = rs1.getString(&quot;entry_no&quot;);</b>
+<b class="fc">&nbsp;                                    ob.Home(connection_2, entry_no);</b>
+<b class="nc">&nbsp;                                    connection_2.close();</b>
+&nbsp;
+<b class="nc">&nbsp;                                }</b>
+&nbsp;                            }
+&nbsp;                        }
+<b class="fc">&nbsp;                    } catch (Exception e) {</b>
+<b class="fc">&nbsp;                        System.err.println(e.getMessage());</b>
+<b class="fc">&nbsp;                    }</b>
+&nbsp;
+<b class="fc">&nbsp;                } else if (Choice == 2) {</b>
+&nbsp;                    try {
+<b class="fc">&nbsp;                        Connection connection_2 = DriverManager.getConnection(DB_URL_2, USER, PASSWORD);</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Email: &quot;);</b>
+<b class="fc">&nbsp;                        Email_id = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Password: &quot;);</b>
+<b class="fc">&nbsp;                        password = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        String sql = &quot;select * from users WHERE email = ?;&quot;;</b>
+<b class="fc">&nbsp;                        PreparedStatement ps = connection_2.prepareStatement(sql);</b>
+<b class="fc">&nbsp;                        ps.setString(1, Email_id);</b>
+<b class="fc">&nbsp;                        ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;                        while (rs.next()) {</b>
+<b class="fc">&nbsp;                            if (!rs.getString(&quot;type&quot;).equals(&quot;faculty&quot;)) {</b>
+<b class="fc">&nbsp;                                System.out.println(&quot;Invalid User Selection&quot;);</b>
+&nbsp;                            } else {
+<b class="fc">&nbsp;                                if (!rs.getString(&quot;email&quot;).equals(Email_id) || !rs.getString(&quot;password&quot;).equals(password)) {</b>
+<b class="fc">&nbsp;                                    System.out.println(&quot;Wrong Email or Password!&quot;);</b>
+&nbsp;                                } else {
+<b class="fc">&nbsp;                                    String sql1 = &quot;select * from faculty where email = ?;&quot;;</b>
+<b class="fc">&nbsp;                                    PreparedStatement ps1 = connection_2.prepareStatement(sql1);</b>
+<b class="fc">&nbsp;                                    ps1.setString(1, Email_id);</b>
+<b class="fc">&nbsp;                                    ResultSet rs1 = ps1.executeQuery();</b>
+<b class="fc">&nbsp;                                    rs1.next();</b>
+<b class="fc">&nbsp;                                    String faculty_id = rs1.getString(&quot;fac_id&quot;);</b>
+<b class="fc">&nbsp;                                    Faculty ob = new Faculty();</b>
+<b class="fc">&nbsp;                                    ob.Home(connection_2, faculty_id);</b>
+&nbsp;
+<b class="nc">&nbsp;                                }</b>
+&nbsp;                            }
+&nbsp;                        }
+<b class="fc">&nbsp;                    } catch (Exception e) {</b>
+<b class="fc">&nbsp;                        System.err.println(e.getMessage());</b>
+<b class="fc">&nbsp;                    }</b>
+&nbsp;                } else {
+&nbsp;                    try {
+<b class="fc">&nbsp;                        Connection connection_2 = DriverManager.getConnection(DB_URL_2, USER, PASSWORD);</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Email: &quot;);</b>
+<b class="fc">&nbsp;                        Email_id = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        System.out.print(&quot;Enter Password: &quot;);</b>
+<b class="fc">&nbsp;                        password = sc.nextLine();</b>
+<b class="fc">&nbsp;                        System.out.println();</b>
+<b class="fc">&nbsp;                        String sql = &quot;select * from users WHERE email = ?;&quot;;</b>
+<b class="fc">&nbsp;                        PreparedStatement ps = connection_2.prepareStatement(sql);</b>
+<b class="fc">&nbsp;                        ps.setString(1, Email_id);</b>
+<b class="fc">&nbsp;                        ResultSet rs = ps.executeQuery();</b>
+<b class="fc">&nbsp;                        while (rs.next()) {</b>
+<b class="fc">&nbsp;                            if (!rs.getString(&quot;type&quot;).equals(&quot;acad&quot;)) {</b>
+<b class="fc">&nbsp;                                System.out.println(&quot;Invalid User Selection&quot;);</b>
+&nbsp;                            } else {
+<b class="fc">&nbsp;                                if (!rs.getString(&quot;email&quot;).equals(Email_id) || !rs.getString(&quot;password&quot;).equals(password)) {</b>
+<b class="fc">&nbsp;                                    System.out.println(&quot;Wrong Email or Password!&quot;);</b>
+&nbsp;                                } else {
+<b class="fc">&nbsp;                                    Acad ob = new Acad();</b>
+<b class="fc">&nbsp;                                    ob.Home(connection_2);</b>
+<b class="nc">&nbsp;                                }</b>
+&nbsp;                            }
+&nbsp;                        }
+<b class="fc">&nbsp;                    } catch (Exception e) {</b>
+<b class="fc">&nbsp;                        System.err.println(e.getMessage());</b>
+<b class="fc">&nbsp;                    }</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;    public static void main(String args[])
+&nbsp;    {
+<b class="nc">&nbsp;        main();</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-03-07 21:27</div>
+</div>
+</body>
+</html>
